@@ -1,0 +1,34 @@
+[
+  {
+    "id": "inq-101",
+    "name": "Lord Alistair Sterling",
+    "email": "sterling@mayfairholding.com",
+    "phone": "+44 20 7946 0912",
+    "craftType": "jet",
+    "craftName": "Gulfstream G700",
+    "travelType": "charter",
+    "departure": "London Luton (EGGW)",
+    "destination": "Nice Côte d’Azur (LFMN)",
+    "date": "2026-10-24",
+    "passengers": 8,
+    "status": "Confirmed",
+    "notes": "Requires Dom Pérignon P2 2004 on board and VIP tarmac helicopter transfer to Monaco.",
+    "createdAt": "2026-10-13T10:00:00.000Z"
+  },
+  {
+    "id": "inq-102",
+    "name": "Elena Rostova",
+    "email": "elena@vanguardcapital.ch",
+    "phone": "+41 22 819 4400",
+    "craftType": "yacht",
+    "craftName": "Lürssen Eclipse",
+    "travelType": "charter",
+    "departure": "Port Hercules, Monaco",
+    "destination": "Saint-Tropez & Corsica",
+    "date": "2026-11-02",
+    "passengers": 14,
+    "status": "Pending",
+    "notes": "Guest list includes high-profile founders. Full privacy protocol required.",
+    "createdAt": "2026-10-13T12:00:00.000Z"
+  }
+]

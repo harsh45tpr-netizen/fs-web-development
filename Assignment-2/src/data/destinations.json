@@ -1,0 +1,50 @@
+[
+  {
+    "id": "dest-1",
+    "name": "Maldives",
+    "tagline": "Tropical Bliss",
+    "country": "Indian Ocean",
+    "image": "/images/dest-maldives.jpg",
+    "airport": "Velana International (VRMM)",
+    "seaport": "North Malé Atoll Superyacht Anchorage",
+    "flightTime": "9h 15m from London / 4h 30m from Dubai",
+    "bestTime": "November – April",
+    "highlights": ["Private Island Seclusion", "Underwater Michelin Dining", "Bioluminescent Beach Nights"]
+  },
+  {
+    "id": "dest-2",
+    "name": "Santorini",
+    "tagline": "Timeless Beauty",
+    "country": "Greece (Aegean Sea)",
+    "image": "/images/dest-santorini.jpg",
+    "airport": "Thira International (LGSR)",
+    "seaport": "Ammoudi Bay & Caldera Marina",
+    "flightTime": "3h 40m from London / 2h 50m from Paris",
+    "bestTime": "May – October",
+    "highlights": ["Clifftop Sunset Helipads", "Volcanic Caldera Cruising", "Private Oia Wine Estates"]
+  },
+  {
+    "id": "dest-3",
+    "name": "Monaco",
+    "tagline": "Luxury & Culture",
+    "country": "French Riviera",
+    "image": "/images/dest-monaco.jpg",
+    "airport": "Nice Côte d’Azur (LFMN) + 7m Heli Transfer",
+    "seaport": "Port Hercules Deep-Water Berth",
+    "flightTime": "1h 50m from London / 8h 20m from New York",
+    "bestTime": "Year-Round (Grand Prix in May)",
+    "highlights": ["Port Hercules Superyacht Grandstand", "Casino de Monte-Carlo VIP Lounges", "Michelin Star Enclaves"]
+  },
+  {
+    "id": "dest-4",
+    "name": "New York",
+    "tagline": "Skyline Majesty",
+    "country": "United States",
+    "image": "/images/dest-newyork.jpg",
+    "airport": "Teterboro VIP Jetport (KTEB)",
+    "seaport": "Chelsea Piers & North Cove Marina",
+    "flightTime": "7h 10m from London / 5h 25m from LA",
+    "bestTime": "September – December & Spring",
+    "highlights": ["Downtown Manhattan Heliports", "Hudson River Sunset Yacht Cruise", "Penthouse Private Galas"]
+  }
+]
