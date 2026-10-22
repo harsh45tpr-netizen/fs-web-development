@@ -74,3 +74,4 @@
 | **Ports** | `5173` | `5000` (Backend) & `5174` (Client) |
 | **Offline Safety**| 100% Standalone (zero DB needed) | Auto In-Memory Fallback if MongoDB is down |
 | **Use Case** | Quick Viva / Front-End Demo | Full Stack Lab Internals Examination |
+
