@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradePulse — Stock Market Brokerage Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Top Navigation & Account Telemetry Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+            <polyline points="16 7 22 7 22 13"></polyline>
+          </svg>
+        </div>
+        <div>
+          <span class="brand-title">TradePulse</span>
+          <span class="brand-badge">JSON DB</span>
+        </div>
+      </div>
+
+      <div class="market-indices">
+        <div class="index-item">
+          <span class="index-name">S&amp;P 500</span>
+          <span class="index-val mono">5,864.20</span>
+          <span class="index-chg up mono">+0.68%</span>
+        </div>
+        <div class="index-item">
+          <span class="index-name">NASDAQ</span>
+          <span class="index-val mono">18,542.85</span>
+          <span class="index-chg up mono">+1.12%</span>
+        </div>
+        <div class="index-item">
+          <span class="index-name">DOW</span>
+          <span class="index-val mono">43,275.90</span>
+          <span class="index-chg down mono">-0.14%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="account-metrics">
+        <div class="metric-box">
+          <span class="metric-label">Net Account Value</span>
+          <span class="metric-value mono" id="navNetValue">$0.00</span>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric-box">
+          <span class="metric-label">Buying Power</span>
+          <span class="metric-value mono highlight-cyan" id="navBuyingPower">$0.00</span>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric-box">
+          <span class="metric-label">Unrealized P&amp;L</span>
+          <span class="metric-value mono" id="navTotalPnL">$0.00</span>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn-Action btn-sim" id="btnToggleLive" title="Toggle automatic live price updates">
+          <span class="pulse-dot" id="liveDot"></span>
+          <span id="liveLabel">Live Feed: ON</span>
+        </button>
+        <button class="btn-Action" id="btnStepTick" title="Simulate 1 market price tick & check limit orders">
+          ⚡ Tick Market
+        </button>
+        <button class="btn-Action" id="btnOpenFunds">
+          💳 Funds
+        </button>
+        <button class="btn-Action btn-db" id="btnOpenDbModal" title="Inspect live data/db.json">
+          { } JSON DB
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main 3-Column Brokerage Terminal Layout -->
+  <main class="terminal-grid">
+    <!-- LEFT COLUMN: Market Watch & Screener -->
+    <aside class="panel market-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Market Explorer</h2>
+        <span class="stock-count-badge mono" id="stockCountBadge">10 Stocks</span>
+      </div>
+
+      <div class="market-controls">
+        <div class="search-wrapper">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="stockSearchInput" placeholder="Search ticker or company..." autocomplete="off" />
+        </div>
+
+        <div class="filter-tabs" id="marketFilterTabs">
+          <button class="filter-pill active" data-filter="ALL">All</button>
+          <button class="filter-pill" data-filter="WATCHLIST">★ Watchlist</button>
+          <button class="filter-pill" data-filter="HOLDINGS">My Holdings</button>
+        </div>
+      </div>
+
+      <div class="stock-list-header">
+        <span>Ticker / Company</span>
+        <span>Last Price / 24h</span>
+      </div>
+
+      <div class="stock-list" id="stockListContainer">
+        <!-- Populated dynamically by app.js -->
+      </div>
+    </aside>
+
+    <!-- CENTER COLUMN: Interactive Chart & Portfolio/Order Books -->
+    <section class="center-stage">
+      <!-- Stock Header & Chart Card -->
+      <div class="panel chart-panel">
+        <div class="instrument-header">
+          <div class="instrument-title-group">
+            <div class="symbol-row">
+              <h1 class="instrument-symbol mono" id="activeSymbol">NVDA</h1>
+              <span class="sector-tag" id="activeSector">Semiconductors</span>
+              <button class="btn-star" id="btnToggleWatchlist" title="Toggle Watchlist">★</button>
+            </div>
+            <p class="instrument-name" id="activeName">NVIDIA Corporation</p>
+          </div>
+
+          <div class="instrument-price-group">
+            <div class="big-price mono" id="activePrice">$138.60</div>
+            <div class="price-change mono" id="activeChange">+$3.80 (+2.82%) Today</div>
+          </div>
+
+          <div class="chart-Controls">
+            <div class="timeframe-group" id="timeframeButtons">
+              <button class="tf-btn active" data-tf="1D">1D</button>
+              <button class="tf-btn" data-tf="1W">1W</button>
+              <button class="tf-btn" data-tf="1M">1M</button>
+              <button class="tf-btn" data-tf="1Y">1Y</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- HTML5 Canvas Chart Container -->
+        <div class="canvas-wrapper">
+          <canvas id="priceChart"></canvas>
+          <div class="chart-tooltip mono" id="chartTooltip"></div>
+        </div>
+
+        <!-- Key Stock Fundamentals Strip -->
+        <div class="fundamentals-grid">
+          <div class="fund-item">
+            <span class="fund-label">Open</span>
+            <span class="fund-val mono" id="statOpen">$135.40</span>
+          </div>
+          <div class="fund-item">
+            <span class="fund-label">Day High</span>
+            <span class="fund-val mono" id="statHigh">$139.90</span>
+          </div>
+          <div class="fund-item">
+            <span class="fund-label">Day Low</span>
+            <span class="fund-val mono" id="statLow">$134.95</span>
+          </div>
+          <div class="fund-item">
+            <span class="fund-label">Prev Close</span>
+            <span class="fund-val mono" id="statPrevClose">$134.80</span>
+          </div>
+          <div class="fund-item">
+            <span class="fund-label">Volume</span>
+            <span class="fund-val mono" id="statVolume">64.2M</span>
+          </div>
+          <div class="fund-item">
+            <span class="fund-label">Mkt Cap</span>
+            <span class="fund-val mono" id="statMktCap">3.39T</span>
+          </div>
+          <div class="fund-item">
+            <span class="fund-label">P/E Ratio</span>
+            <span class="fund-val mono" id="statPE">54.2</span>
+          </div>
+          <div class="fund-item">
+            <span class="fund-label">52W Range</span>
+            <span class="fund-val mono" id="stat52W">$75.60 - $143.71</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Tabbed Panel: Portfolio Holdings, Open Limit Orders, Order History -->
+      <div class="panel blotter-panel">
+        <div class="blotter-tabs">
+          <button class="blotter-tab active" data-tab="holdings">
+            Portfolio Holdings <span class="tab-count mono" id="badgeHoldings">0</span>
+          </button>
+          <button class="blotter-tab" data-tab="open-orders">
+            Open Limit Orders <span class="tab-count mono" id="badgeOpenOrders">0</span>
+          </button>
+          <button class="blotter-tab" data-tab="history">
+            Order History (db.json) <span class="tab-count mono" id="badgeHistory">0</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: Portfolio Holdings -->
+        <div class="blotter-content active" id="tab-holdings">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Instrument</th>
+                  <th class="num">Shares</th>
+                  <th class="num">Avg Cost</th>
+                  <th class="num">Last Price</th>
+                  <th class="num">Market Value</th>
+                  <th class="num">Unrealized P&amp;L</th>
+                  <th class="num">Quick Action</th>
+                </tr>
+              </thead>
+              <tbody id="holdingsTableBody">
+                <!-- Populated by app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 2: Open Limit Orders -->
+        <div class="blotter-content" id="tab-open-orders">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Placed</th>
+                  <th>Symbol</th>
+                  <th>Side / Type</th>
+                  <th class="num">Qty</th>
+                  <th class="num">Limit Price</th>
+                  <th class="num">Current Mkt</th>
+                  <th class="num">Reserved Value</th>
+                  <th class="num">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="openOrdersTableBody">
+                <!-- Populated by app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 3: Full Order History -->
+        <div class="blotter-content" id="tab-history">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Timestamp</th>
+                  <th>Symbol</th>
+                  <th>Side</th>
+                  <th>Type</th>
+                  <th class="num">Qty</th>
+                  <th class="num">Exec / Limit Price</th>
+                  <th class="num">Total Value</th>
+                  <th class="num">Realized P&amp;L</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <!-- Populated by app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: Buy / Sell Order Execution Ticket -->
+    <aside class="panel order-panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Order Ticket</h2>
+          <p class="panel-subtitle" id="ticketSubtitle">Execute Market or Limit Order</p>
+        </div>
+        <span class="ticket-symbol-pill mono" id="ticketSymbolBadge">NVDA</span>
+      </div>
+
+      <!-- Current Position Snapshot for Selected Stock -->
+      <div class="position-callout" id="selectedPositionBox">
+        <div class="pos-row">
+          <span class="pos-label">Your Position in <strong id="posSymbol">NVDA</strong></span>
+          <span class="pos-shares mono" id="posShares">0 Shares</span>
+        </div>
+        <div class="pos-row sub">
+          <span id="posAvgCost">Avg Cost: —</span>
+          <span class="mono" id="posPnL">P&amp;L: —</span>
+        </div>
+      </div>
+
+      <form id="orderForm" class="order-form" novalidate>
+        <!-- BUY / SELL Toggle -->
+        <div class="side-toggle">
+          <button type="button" class="side-btn buy active" id="btnSideBuy" data-side="BUY">
+            BUY <span class="side-sub">Long</span>
+          </button>
+          <button type="button" class="side-btn sell" id="btnSideSell" data-side="SELL">
+            SELL <span class="side-sub">Exit</span>
+          </button>
+        </div>
+
+        <!-- Order Type: MARKET vs LIMIT -->
+        <div class="form-group">
+          <label class="form-label">Order Type</label>
+          <div class="type-toggle">
+            <button type="button" class="type-btn active" data-type="MARKET">Market Order</button>
+            <button type="button" class="type-btn" data-type="LIMIT">Limit Order</button>
+          </div>
+        </div>
+
+        <!-- Quantity Input -->
+        <div class="form-group">
+          <div class="label-row">
+            <label class="form-label" for="orderQty">Quantity (Shares)</label>
+            <span class="available-hint mono" id="maxAvailHint">Max: 0</span>
+          </div>
+          <div class="input-with-stepper">
+            <input type="number" id="orderQty" min="1" step="1" value="10" required class="mono" />
+          </div>
+          <div class="quick-qty-bar">
+            <button type="button" class="qty-chip" data-qty="1">1</button>
+            <button type="button" class="qty-chip" data-qty="5">5</button>
+            <button type="button" class="qty-chip" data-qty="10">10</button>
+            <button type="button" class="qty-chip" data-qty="25">25</button>
+            <button type="button" class="qty-chip" data-qty="MAX">MAX</button>
+          </div>
+        </div>
+
+        <!-- Limit Price Input (Shown only when LIMIT is selected) -->
+        <div class="form-group hidden" id="limitPriceGroup">
+          <div class="label-row">
+            <label class="form-label" for="orderLimitPrice">Limit Price ($)</label>
+            <span class="available-hint mono" id="mktPriceRef">Mkt: $138.60</span>
+          </div>
+          <div class="input-with-stepper">
+            <input type="number" id="orderLimitPrice" min="0.01" step="0.05" value="138.60" class="mono" />
+          </div>
+          <div class="quick-qty-bar">
+            <button type="button" class="limit-chip" data-offset="-0.02">-2%</button>
+            <button type="button" class="limit-chip" data-offset="-0.01">-1%</button>
+            <button type="button" class="limit-chip" data-offset="0">Mkt Price</button>
+            <button type="button" class="limit-chip" data-offset="0.01">+1%</button>
+            <button type="button" class="limit-chip" data-offset="0.02">+2%</button>
+          </div>
+          <p class="limit-behavior-note" id="limitBehaviorHint">
+            Limit Buy below market price will rest as an OPEN order until triggered.
+          </p>
+        </div>
+
+        <!-- Time in Force -->
+        <div class="form-group">
+          <label class="form-label" for="orderTIF">Time in Force</label>
+          <select id="orderTIF" class="form-select">
+            <option value="DAY">DAY — Valid for Today's Session</option>
+            <option value="GTC">GTC — Good 'Til Cancelled</option>
+          </select>
+        </div>
+
+        <!-- Live Order Financial Summary -->
+        <div class="order-summary-card">
+          <div class="summary-row">
+            <span>Execution Mode</span>
+            <span class="mono" id="summaryExecMode">Instant Market Fill</span>
+          </div>
+          <div class="summary-row">
+            <span id="summaryPriceLabel">Market Price</span>
+            <span class="mono" id="summaryPriceVal">$138.60</span>
+          </div>
+          <div class="summary-row">
+            <span>Brokerage Fee</span>
+            <span class="mono text-green">$0.00 (Free)</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row total">
+            <span>Estimated Total</span>
+            <span class="mono" id="summaryTotalVal">$1,386.00</span>
+          </div>
+          <div class="summary-row sub">
+            <span id="summaryAvailLabel">Available Buying Power</span>
+            <span class="mono" id="summaryAvailVal">$46,750.75</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit-order buy" id="btnSubmitOrder">
+          Place BUY Market Order
+        </button>
+      </form>
+    </aside>
+  </main>
+
+  <!-- MODAL 1: Deposit / Withdraw Funds -->
+  <div class="modal-backdrop hidden" id="fundsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Brokerage Cash &amp; Wallet</h3>
+        <button class="modal-close" id="btnCloseFunds">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="wallet-balances">
+          <div class="wallet-stat">
+            <span>Total Cash Balance</span>
+            <strong class="mono" id="modalTotalCash">$0.00</strong>
+          </div>
+          <div class="wallet-stat">
+            <span>Reserved in Open Limit Orders</span>
+            <strong class="mono" id="modalReservedCash">$0.00</strong>
+          </div>
+          <div class="wallet-stat highlight">
+            <span>Available Buying Power</span>
+            <strong class="mono" id="modalAvailCash">$0.00</strong>
+          </div>
+        </div>
+
+        <form id="fundsForm" class="funds-form">
+          <div class="side-toggle">
+            <button type="button" class="side-btn buy active" id="btnFundDeposit" data-action="DEPOSIT">Deposit Funds</button>
+            <button type="button" class="side-btn sell" id="btnFundWithdraw" data-action="WITHDRAW">Withdraw Funds</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fundAmount">Amount ($ USD)</label>
+            <input type="number" id="fundAmount" min="10" step="50" value="5000" required class="mono" />
+            <div class="quick-qty-bar">
+              <button type="button" class="fund-chip" data-amt="1000">+$1,000</button>
+              <button type="button" class="fund-chip" data-amt="5000">+$5,000</button>
+              <button type="button" class="fund-chip" data-amt="10000">+$10,000</button>
+              <button type="button" class="fund-chip" data-amt="25000">+$25,000</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit-order buy" id="btnSubmitFunds">Confirm Deposit to JSON DB</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Live JSON Database Inspector -->
+  <div class="modal-backdrop hidden" id="dbModal">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <div>
+          <h3>Live JSON Database Inspector (<code>data/db.json</code>)</h3>
+          <p class="modal-subtitle">Every order, cancellation, price tick, and fund transfer persists directly to disk.</p>
+        </div>
+        <button class="modal-close" id="btnCloseDbModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <pre class="json-viewer mono" id="jsonDbViewer"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
